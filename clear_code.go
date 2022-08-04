@@ -53,6 +53,15 @@ func ClearCode(filePath string) (string, error) {
 	return result, nil
 }
 
+// ClearPythonMain 清除Python的入口main代码块。
+// 这个方法是可选的，因为大部分Python代码中，main代码块都是用来做测试的。
+// 但是也可能是整个程序的入口，有可能存在大量的逻辑代码。
+func ClearPythonMain(code string) string {
+	reg := regexp.MustCompile(`if __name__[\s\S]*`)
+	result := reg.ReplaceAllString(code, "")
+	return result
+}
+
 // SplitCode 按照指定的切割字符切割代码字符串，并移除包含在removeStrArr中的字符串
 func SplitCode(codeStr string, splitStr string, removeStrArr []string) []string {
 	// 切割字符串

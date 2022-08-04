@@ -1,21 +1,8 @@
-# zdpgo_clearcode
-
-清除代码中的注释，空行等内容，得到一个干净的代码
-
-## 版本历史
-
-- v0.1.0 新增：移除多余注释，空行
-- v0.1.1 新增：切割代码字符串
-
-## 使用示例
-
-### 移除各语言注释空行
-
-```go
 package main
 
 import (
 	"fmt"
+
 	"github.com/zhangdapeng520/zdpgo_clearcode"
 )
 
@@ -36,6 +23,8 @@ func main() {
 	// 清除代码
 	for _, filePath := range filePathList {
 		fmt.Println(filePath)
+
+		// 先清洗
 		result, err := zdpgo_clearcode.ClearCode(filePath)
 		if err != nil {
 			fmt.Println(err)
@@ -43,6 +32,12 @@ func main() {
 		}
 		fmt.Println(result)
 		fmt.Println("========================")
+
+		// 切割代码
+		codeArr := zdpgo_clearcode.SplitCode(result, "\n", nil)
+		fmt.Println(codeArr)
+		fmt.Println("========================")
+		fmt.Println()
+		fmt.Println()
 	}
 }
-```

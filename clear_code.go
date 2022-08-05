@@ -57,8 +57,15 @@ func ClearCode(filePath string) (string, error) {
 // 这个方法是可选的，因为大部分Python代码中，main代码块都是用来做测试的。
 // 但是也可能是整个程序的入口，有可能存在大量的逻辑代码。
 func ClearPythonMain(code string) string {
+	// 替换main代码块
 	reg := regexp.MustCompile(`if __name__[\s\S]*`)
 	result := reg.ReplaceAllString(code, "")
+
+	// 替换末尾空行
+	reg = regexp.MustCompile(`\s*$`)
+	result = reg.ReplaceAllString(result, "")
+
+	// 返回
 	return result
 }
 
@@ -80,6 +87,9 @@ func SplitCode(codeStr string, splitStr string, removeStrArr []string) []string 
 				isRemove = true
 				break
 			} else if strings.HasPrefix(rm, "^") && strings.HasPrefix(code, rm[1:]) { // 以指定前缀开头移除
+				isRemove = true
+				break
+			} else if strings.TrimSpace(code) == "" { // 空字符串
 				isRemove = true
 				break
 			}

@@ -78,7 +78,7 @@ func SplitCode(codeStr string, splitStr string, removeStrArr []string) []string 
 	var result []string
 	for _, code := range codeArr {
 		// 移除空格，避免干扰判断
-		code = strings.TrimSpace(code)
+		code = strings.Replace(code, " ", "", -1)
 
 		// 判断是否需要移除
 		isRemove := false

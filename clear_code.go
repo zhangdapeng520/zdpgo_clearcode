@@ -2,6 +2,7 @@ package zdpgo_clearcode
 
 import (
 	"io/ioutil"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -14,41 +15,53 @@ func ClearCode(filePath string) (string, error) {
 		return "", err
 	}
 
-	// 替换注释
-	reg := regexp.MustCompile(`#.*`)
-	result := reg.ReplaceAllString(string(fileContent), "")
+	// 获取文件后缀
+	suffix := filepath.Ext(filePath)
+	var (
+		reg    *regexp.Regexp
+		result string = string(fileContent)
+	)
 
-	// 替换文档字符串
-	reg = regexp.MustCompile(`'''[\s\S]*?'''`)
-	result = reg.ReplaceAllString(result, "")
+	// 根据后缀进行不同的处理，减少正则替换次数
+	switch suffix {
+	case ".py":
+		// 替换注释
+		reg = regexp.MustCompile(`#.*`)
+		result = reg.ReplaceAllString(result, "")
 
-	reg = regexp.MustCompile(`"""[\s\S]*?"""`)
-	result = reg.ReplaceAllString(result, "")
+		// 替换文档字符串
+		reg = regexp.MustCompile(`'''[\s\S]*?'''`)
+		result = reg.ReplaceAllString(result, "")
+		reg = regexp.MustCompile(`"""[\s\S]*?"""`)
+		result = reg.ReplaceAllString(result, "")
 
-	// 替换//类型注释
-	reg = regexp.MustCompile(`\s//.*`)
-	result = reg.ReplaceAllString(result, "")
+	default:
+		// 替换//类型注释
+		reg = regexp.MustCompile(`\s//.*`)
+		result = reg.ReplaceAllString(result, "")
 
-	// 替换代码行后面的 // 注释
-	reg = regexp.MustCompile(`;\s*//.*`)
-	result = reg.ReplaceAllString(result, ";")
+		// 替换代码行后面的 // 注释
+		reg = regexp.MustCompile(`;\s*//.*`)
+		result = reg.ReplaceAllString(result, ";")
 
-	// 替换多行注释
-	reg = regexp.MustCompile(`(\/\/.*$)|(\/\*(.|\s)*?\*\/)`)
-	result = reg.ReplaceAllString(result, "")
+		// 替换多行注释
+		reg = regexp.MustCompile(`(\/\/.*$)|(\/\*(.|\s)*?\*\/)`)
+		result = reg.ReplaceAllString(result, "")
+	}
 
-	// 替换开头空行
-	reg = regexp.MustCompile(`^\s*\n`)
-	result = reg.ReplaceAllString(result, "")
-
-	// 替换末尾空行
-	reg = regexp.MustCompile(`\s*$`)
-	result = reg.ReplaceAllString(result, "")
+	// 说明：这里开头行和末尾行，只有一行，甚至可能一行都没有
+	// 所以：没有必要在这里浪费2次正则替换的时间
+	//// 替换开头空行
+	//reg = regexp.MustCompile(`^\s*\n`)
+	//result = reg.ReplaceAllString(result, "")
+	//
+	//// 替换末尾空行
+	//reg = regexp.MustCompile(`\s*$`)
+	//result = reg.ReplaceAllString(result, "")
 
 	// 替换中间空行
 	reg = regexp.MustCompile(`\s*\n+`)
 	result = reg.ReplaceAllString(result, "\n")
-
 	// 返回
 	return result, nil
 }
@@ -62,8 +75,8 @@ func ClearPythonMain(code string) string {
 	result := reg.ReplaceAllString(code, "")
 
 	// 替换末尾空行
-	reg = regexp.MustCompile(`\s*$`)
-	result = reg.ReplaceAllString(result, "")
+	//reg = regexp.MustCompile(`\s*$`)
+	//result = reg.ReplaceAllString(result, "")
 
 	// 返回
 	return result
@@ -78,7 +91,7 @@ func SplitCode(codeStr string, splitStr string, removeStrArr []string) []string 
 	var result []string
 	for _, code := range codeArr {
 		// 移除空格，避免干扰判断
-		code = strings.Replace(code, " ", "", -1)
+		code = strings.TrimSpace(code)
 
 		// 判断是否需要移除
 		isRemove := false
@@ -89,7 +102,7 @@ func SplitCode(codeStr string, splitStr string, removeStrArr []string) []string 
 			} else if strings.HasPrefix(rm, "^") && strings.HasPrefix(code, rm[1:]) { // 以指定前缀开头移除
 				isRemove = true
 				break
-			} else if strings.TrimSpace(code) == "" { // 空字符串
+			} else if code == "" { // 空字符串
 				isRemove = true
 				break
 			}

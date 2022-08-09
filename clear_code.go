@@ -102,6 +102,10 @@ func SplitCode(codeStr string, splitStr string, removeStrArr []string) []string 
 			} else if strings.HasPrefix(rm, "^") && strings.HasPrefix(code, rm[1:]) { // 以指定前缀开头移除
 				isRemove = true
 				break
+			} else if strings.HasPrefix(rm, "%") && // 清空空格后相等
+				strings.Replace(code, " ", "", -1) == rm[1:] {
+				isRemove = true
+				break
 			} else if code == "" { // 空字符串
 				isRemove = true
 				break

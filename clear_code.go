@@ -30,9 +30,9 @@ func ClearCode(filePath string) (string, error) {
 		result = reg.ReplaceAllString(result, "")
 
 		// 替换文档字符串
-		reg = regexp.MustCompile(`'''[\s\S]*?'''`)
+		reg = regexp.MustCompile(`\n\s*'''[\s\S]*?'''`)
 		result = reg.ReplaceAllString(result, "")
-		reg = regexp.MustCompile(`"""[\s\S]*?"""`)
+		reg = regexp.MustCompile(`\n\s*"""[\s\S]*?"""`)
 		result = reg.ReplaceAllString(result, "")
 
 	default:

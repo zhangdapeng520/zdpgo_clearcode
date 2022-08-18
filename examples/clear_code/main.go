@@ -17,6 +17,7 @@ func main() {
 		"examples/test_data/level1_2.php",
 		"examples/test_data/level1_2.c",
 		"examples/test_data/level1_2.cpp",
+		"examples/test_data/level2_3.py",
 	}
 
 	// 清除代码

@@ -7,16 +7,38 @@ import (
 	"strings"
 )
 
-// ClearCode 清除代码中的注释，空行
-func ClearCode(filePath string) (string, error) {
+// GetFileContentAndSuffix 获取文件的内容和后缀
+func GetFileContentAndSuffix(filePath string) (string, string, error) {
 	// 读取文件
 	fileContent, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	// 获取文件后缀
 	suffix := filepath.Ext(filePath)
+
+	// 返回
+	return string(fileContent), suffix, nil
+}
+
+// Format 格式化代码
+func Format(data string) string {
+	// 在每个 { 的后面插入换行符
+	result := strings.Replace(data, "{", "{\n", -1)
+
+	// 在每个 } 的前面插入换行符
+	result = strings.Replace(data, "}", "\n}", -1)
+
+	// 在每个 ; 后面插入换行符
+	result = strings.Replace(data, ";", ";\n", -1)
+
+	// 返回
+	return result
+}
+
+// ClearCode 清除代码中的注释，空行
+func ClearCode(fileContent, suffix string) (string, error) {
 	var (
 		reg    *regexp.Regexp
 		result string = string(fileContent)
